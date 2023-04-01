@@ -2,6 +2,8 @@ abstract class QRCodeChecker {
   bool isFiscal(String code);
 }
 
+
+// TODO: Добавить распознавание кодов egais
 class ReceiptInfo{
   final String timestamp;
   final String sum;

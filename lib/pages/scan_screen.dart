@@ -2,6 +2,8 @@ import 'package:balanceit/utils/parsing/receipt_info.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 
+import '../themes/colors.dart';
+
 class ScanScreen extends StatefulWidget {
   const ScanScreen({Key? key}) : super(key: key);
 
@@ -37,7 +39,7 @@ class _ScanScreenState extends State<ScanScreen> {
               height: 200,
               width: 200,
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.greenAccent, width: 4),
+                border: Border.all(color: secondColor, width: 4),
                 borderRadius: BorderRadius.circular(12),
               ),
             ),

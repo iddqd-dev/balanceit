@@ -38,11 +38,9 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   qr_code_scanner: ^1.0.1
-<<<<<<< HEAD
-=======
   sqflite: ^2.2.6
   path: ^1.8.3
->>>>>>> Добавлена поддержка SQLite, набросана базовая "архитектура" бд.
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
