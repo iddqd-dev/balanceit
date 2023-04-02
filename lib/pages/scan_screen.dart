@@ -53,6 +53,7 @@ class _ScanScreenState extends State<ScanScreen> {
     this.controller = controller;
     controller.scannedDataStream.listen((scanData) {
       setState(() {
+        print(scanData.code);
         this.scanData = scanData.code!;
         if (!checker.isFiscal(this.scanData)){
           showUnsupportedCodeDialog(context, controller);
@@ -74,7 +75,7 @@ void showUnsupportedCodeDialog(BuildContext context, QRViewController controller
     builder: (BuildContext context) {
       return AlertDialog(
         title: const Text("Данный QR код не поддерживается"),
-        content: const Text("Сосканируйте другой код или введите сумму вручную."),
+        content: const Text("Сосканируйте другой код или введите информацию вручную."),
         actions: <Widget>[
           ElevatedButton(
             child: const Text("OK"),

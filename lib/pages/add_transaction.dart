@@ -19,7 +19,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
-  String _selectedOption = "1";
+  String _selectedOption = "0";
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -140,7 +140,8 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
                         firstDate: DateTime(2000),
                         lastDate: DateTime(2100),
                       ).then((date) {
-                        showTimePicker(
+                        if (date != null) {
+                        showTimePicker( 
                             context: context, initialTime: TimeOfDay.now())
                             .then((time) {
                           if (date != null && time != null) {
@@ -150,7 +151,7 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
                                     time.minute));
                           }
                         });
-                      });
+                      }});
                     },
                     decoration: const InputDecoration(
                       labelStyle: TextStyle(),

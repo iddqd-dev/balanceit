@@ -1,8 +1,9 @@
-import 'package:balanceit/pages/add_transaction.dart';
+import 'package:balanceit/pages/fckng_debts.dart';
+import 'package:balanceit/pages/main.dart';
+import 'package:balanceit/pages/monthly_payments.dart';
 import 'package:balanceit/themes/mainTheme.dart';
 import 'package:balanceit/utils/database/database_adapter.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,168 +18,53 @@ class BalanceIt extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: mainTheme,
-      home: const MainPage(),
+      home: const NavigationBar(),
     );
   }
 }
 
-class MainPage extends StatefulWidget {
-  const MainPage({Key? key}) : super(key: key);
+// TODO: сделать навигацию
+class NavigationBar extends StatefulWidget {
+  const NavigationBar({Key? key}) : super(key: key);
 
   @override
-  State<MainPage> createState() => _MainPageState();
+  State<NavigationBar> createState() => _NavigationBarState();
 }
 
-class _MainPageState extends State<MainPage> {
-  DatabaseHelper dbHelper = DatabaseHelper();
-  List<Map<String, dynamic>> dataList = [];
-  String? budgetValue = '0';
+class _NavigationBarState extends State<NavigationBar> {
+  int _currentIndex = 1;
 
-  _getTransactions() async {
-    List<Map<String, dynamic>> result = await dbHelper.getData('transactions');
-    setState(() {
-      dataList = result;
-    });
-  }
+  final List<Widget> _screens = [
+    const MonthlyPayments(),
+    const MainPage(),
+    const Debts(),
+  ];
 
-  @override
-  void initState() {
-    _getTransactions();
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            barrierDismissible: false,
-            context: context,
-            builder: (context) {
-              return AddTransactionForm(
-                onFormSubmit: (option, amount, category, description, date) {
-                  dbHelper.addTransaction({
-                    'type': option,
-                    'amount': double.parse(amount),
-                    'category': category,
-                    'description': description,
-                    'date': DateFormat('dd.MM.yyyy HH:mm')
-                        .parse(date)
-                        .toIso8601String(),
-                    'is_owed': 0,
-                    'is_lent': 0,
-                  });
-                  _getTransactions();
-                },
-              );
-            },
-          );
+      body: _screens[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (int index) {
+          setState(() {
+            _currentIndex = index;
+          });
         },
-        child: const Icon(Icons.add),
-      ),
-      appBar: AppBar(
-        actions: <Widget>[
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Row(
-              children: <Widget>[
-                Text(
-                  '$budgetValue',
-                  style: const TextStyle(fontSize: 26),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.settings),
-                  onPressed: () {
-                    // TODO: Обработчик нажатия кнопки настройки
-                  },
-                ),
-              ],
-            ),
+        items: const [
+          BottomNavigationBarItem(
+              icon: Icon(Icons.calendar_month),
+              label: 'Плановые'
           ),
-        ],
-      ),
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Expanded(
-            child: SizedBox(
-              child: ListView.builder(
-                  itemCount: dataList.length,
-                  itemBuilder: (context, index) {
-                    final typeConfig = {
-                      '0': {
-                        'icon': const Icon(Icons.money_off,
-                            color: Colors.red, size: 34),
-                        'transactionType': const Text('Потрачено'),
-                        'textColor': Colors.red,
-                        'textAmount': '-${dataList[index]['amount']}',
-                      },
-                      '1': {
-                        'icon': const Icon(Icons.attach_money,
-                            color: Colors.green, size: 34),
-                        'transactionType': const Text('Получено'),
-                        'textColor': Colors.green,
-                        'textAmount': '+${dataList[index]['amount']}',
-                      }
-                    };
-                    final config = typeConfig[dataList[index]['type']];
-                    return Dismissible(
-                      key: Key(dataList[index]['id'].toString()),
-                      direction: DismissDirection.horizontal,
-                      onDismissed: (direction) async {
-                        if (direction == DismissDirection.endToStart) {
-                          await dbHelper.deleteData(
-                              'transactions', dataList[index]['id']);
-                          setState(() {
-                            _getTransactions();
-                          });
-                        } else {
-                          //TODO: Сделать левый свайп.
-                        }
-                      },
-                      background: Container(
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 20.0),
-                        color: Colors.red,
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text('Удалить', style: TextStyle(color: Colors.white),),
-                            Icon(Icons.delete, color: Colors.white)
-                          ],
-                        ),
-                      ),
-                      child: Card(
-                        color: Colors.white,
-                        child: ListTile(
-                          // TODO: сделать вывод настроек.
-                          onLongPress: () {},
-                          // TODO: сделать вывод чека. если договорюсь с налоговой.
-                          onTap: () {},
-                          leading: config!['icon'] as Icon,
-                          title: Text(dataList[index]['category']),
-                          subtitle: config['transactionType'] as Text,
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                config['textAmount'].toString(),
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: config['textColor'] as Color),
-                              ),
-                              Text(DateFormat('hh:mm dd.MM.yyyy').format(
-                                  DateTime.parse('${dataList[index]['date']}')))
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
-            ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.attach_money),
+              label: 'Доход/расход'
           ),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.credit_card),
+              label: 'Долги'
+          )
         ],
       ),
     );
