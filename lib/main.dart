@@ -3,11 +3,15 @@ import 'package:balanceit/pages/main.dart';
 import 'package:balanceit/pages/monthly_payments.dart';
 import 'package:balanceit/themes/mainTheme.dart';
 import 'package:balanceit/utils/database/database_adapter.dart';
+import 'package:balanceit/utils/notification_service.dart';
 import 'package:flutter/material.dart';
+
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await DatabaseHelper().db;
+  NotificationService().initNotification();
+  await DatabaseHelper().initDb();
   runApp(const BalanceIt());
 }
 
@@ -17,13 +21,13 @@ class BalanceIt extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: mainTheme,
       home: const NavigationBar(),
     );
   }
 }
 
-// TODO: сделать навигацию
 class NavigationBar extends StatefulWidget {
   const NavigationBar({Key? key}) : super(key: key);
 

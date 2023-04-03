@@ -1,29 +1,44 @@
-import 'package:balanceit/pages/scan_screen.dart';
-import 'package:balanceit/utils/parsing/receipt_info.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' as svc;
 import 'package:intl/intl.dart';
 
-class AddTransactionForm extends StatefulWidget {
-  final Function(String, String, String, String, String) onFormSubmit;
+import '../utils/database/database_adapter.dart';
 
-  const AddTransactionForm({super.key, required this.onFormSubmit});
+class EditTransactionForm extends StatefulWidget {
+  final Function(String, String, String, String, String) onFormSubmit;
+  final int index;
+  const EditTransactionForm({super.key, required this.onFormSubmit, required this.index});
 
   @override
-  State<AddTransactionForm> createState() => _AddTransactionFormState();
+  State<EditTransactionForm> createState() => _EditTransactionFormState();
 }
 
-class _AddTransactionFormState extends State<AddTransactionForm> {
-  final TextEditingController _amountController = TextEditingController(text: '0.0');
+class _EditTransactionFormState extends State<EditTransactionForm> {
+
+  final TextEditingController _amountController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _dateController = TextEditingController(text: DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now()));
+  final TextEditingController _dateController = TextEditingController();
 
+  DatabaseHelper dbHelper = DatabaseHelper();
   String _selectedOption = "0";
   final _formKey = GlobalKey<FormState>();
 
+  _getTransactionDataFromDatabase() async {
+    List<Map<String, dynamic>> result = await dbHelper.getTransactionData(widget.index.toString());
+    setState(() {
+      DateTime inputDateTime = DateTime.parse(result[0]['date']);
+      _amountController.text = result[0]['amount'].toString();
+      _categoryController.text = result[0]['category'].toString();
+      _descriptionController.text = result[0]['description'].toString();
+      _dateController.text = DateFormat('dd.MM.yyyy HH:mm').format(inputDateTime);
+      _selectedOption = result[0]['type'].toString();
+    });
+  }
+
   @override
   void initState() {
+    _getTransactionDataFromDatabase();
     _amountController.addListener(() {
       final text = _amountController.text;
       _amountController.value = _amountController.value.copyWith(
@@ -85,11 +100,6 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
               child: Column(
                 children: [
                   TextFormField(
-                    onTap: () {
-                      setState(() {
-                        _amountController.text = '';
-                      });
-                    },
                     textInputAction: TextInputAction.next,
                     keyboardType: TextInputType.number,
                     inputFormatters: [
@@ -146,17 +156,17 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
                         lastDate: DateTime(2100),
                       ).then((date) {
                         if (date != null) {
-                        showTimePicker(
-                            context: context, initialTime: TimeOfDay.now())
-                            .then((time) {
-                          if (date != null && time != null) {
-                            _dateController.text =
-                                DateFormat('dd.MM.yyyy HH:mm').format(DateTime(
-                                    date.year, date.month, date.day, time.hour,
-                                    time.minute));
-                          }
-                        });
-                      }});
+                          showTimePicker(
+                              context: context, initialTime: TimeOfDay.now())
+                              .then((time) {
+                            if (time != null) {
+                              _dateController.text =
+                                  DateFormat('dd.MM.yyyy HH:mm').format(DateTime(
+                                      date.year, date.month, date.day, time.hour,
+                                      time.minute));
+                            }
+                          });
+                        }});
                     },
                     decoration: const InputDecoration(
                       labelStyle: TextStyle(),
@@ -188,24 +198,6 @@ class _AddTransactionFormState extends State<AddTransactionForm> {
           onPressed: () {
             Navigator.pop(context);
           },
-        ),
-        ElevatedButton(
-          onPressed: () async {
-            ReceiptInfo? scanResult = await Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ScanScreen()),
-            );
-            if (scanResult != null) {
-              setState(() {
-                int amountInt = int.tryParse(scanResult.sum) ?? 0;
-                double amountDouble = amountInt / 100;
-                _amountController.text = amountDouble.toStringAsFixed(2);
-                _dateController.text = DateFormat('dd.MM.yyyy HH:mm')
-                    .format(DateTime.parse(scanResult.timestamp));
-              });
-            }
-          },
-          child: const Text('Сканировать QR'),
         ),
         ElevatedButton(
           child: const Text("Save"),

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "660476424832",
+    "project_id": "balance-it-62400",
+    "storage_bucket": "balance-it-62400.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:660476424832:android:a5ca3458c2b8d65fd2ec65",
+        "android_client_info": {
+          "package_name": "com.aru.balanceit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "660476424832-cn57o1ulak1iqnmjt5iqkh942c25gd17.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxPtZc7wmXr-GfPDxPz3MkagHqq-67610"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "660476424832-cn57o1ulak1iqnmjt5iqkh942c25gd17.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

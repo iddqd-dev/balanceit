@@ -89,10 +89,19 @@ class DatabaseHelper {
     return dbClient!.query(table, limit: null);
   }
 
+  Future<List<Map<String, dynamic>>> getTransactionData(String id) async {
+    var dbClient = await db;
+    return dbClient!.query('transactions', limit: null, where: 'id= ?', whereArgs: [id]);
+  }
+
   Future<int> updateData(
       String table, Map<String, dynamic> data, int id) async {
     var dbClient = await db;
     return dbClient!.update(table, data, where: 'id = ?', whereArgs: [id]);
+  }
+  Future<int> updateTransactionData(Map<String, dynamic> data, int id) async {
+    var dbClient = await db;
+    return dbClient!.update('transactions', data, where: 'id = ?', whereArgs: [id]);
   }
 
   Future<int> deleteData(String table, int id) async {
